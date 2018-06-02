@@ -1,7 +1,7 @@
-var http = require('http');
-var fs = require('fs');
-var path = require('path');
-
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+require('dotenv').config();
 
 function send404(response) {
     response.writeHead(404, {
@@ -14,7 +14,7 @@ function send404(response) {
 var mimeLookup = {
     '.js': 'application/javascript',
     '.html': 'text/html',
-    '.css':'text/css'
+    '.css': 'text/css'
 };
 
 var server = http.createServer(function (req, res) {
@@ -45,6 +45,7 @@ var server = http.createServer(function (req, res) {
     } else {
         send404(res);
     }
-}).listen(8085);
+}).listen(process.env.PORT);
 
-console.log('server running on port 8085');
+
+console.log(`server running ${process.env.PORT}`);

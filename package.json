@@ -4,6 +4,7 @@
   "description": "for Valentin",
   "main": "server.js",
   "dependencies": {
+    "dotenv": "^6.0.0",
     "mongodb": "^3.0.10"
   },
   "devDependencies": {},
