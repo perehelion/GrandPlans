@@ -1,0 +1,16 @@
+{
+  "name": "grand-plans",
+  "version": "1.0.0",
+  "description": "for Valentin",
+  "main": "server.js",
+  "dependencies": {
+    "mongodb": "^3.0.10"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "perehelion",
+  "license": "ISC"
+}
