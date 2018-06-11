@@ -44,9 +44,6 @@ var server = http.createServer(function (req, res) {
                 for (const query in urlObj.query) {
                     switch (query) {
                         case "table":
-                            res.writeHead(200, {
-                                'Content-Type': mimeType
-                            });
                             fs.readFile('/home/inperegelion/projects/GrandPlans/other/sample.xls', (err, data) => {
                                 data = new Uint8Array(data)
                                 var data = xlsx.read(data, {
@@ -82,6 +79,18 @@ var server = http.createServer(function (req, res) {
                 fs.createReadStream(filepath).pipe(res);
                 console.log(`${new Date().getHours()}:${new Date().getMinutes()}  just sent a ${req.url}`);
             });
+        } else if (req.method == 'POST' && req.url=='/') {
+            let body = '';
+            req.on('data', data => {
+                body += data;
+            })
+            body += '\n'
+            req.on('end', () => {
+                body += '\n'
+                fs.appendFile('./other/log', body, 'utf8', () => {
+                    res.write(body)
+                })
+            })
         }
     }).then(() => {
         res.end()

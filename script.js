@@ -33,3 +33,17 @@ function pigmantate() {
 $(document).ready(function () {
     pigmantate();
 });
+
+
+
+let url = "http://localhost:8085"
+fetch(url, {
+    method: 'post',
+    body: JSON.stringify({
+        age: 20
+    })
+}).then((answer) => {
+    var reader = answer.body.getReader().read().then((done, value) => {
+        console.log(new TextDecoder("utf-8").decode(done.value));
+    })
+})
