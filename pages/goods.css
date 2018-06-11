@@ -1,0 +1,30 @@
+header {
+	margin: 0%;
+	padding: 0%;
+	text-align: center;
+}
+
+header:first-child {
+	padding: 1%;
+	margin-bottom: 1%
+}
+
+footer {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+hr {
+	/* display: block; => это было в примере, но я не разобрлся зачем оно*/
+	/* я в этом блоке понимаю только бодыр...*/
+	margin-top: 1em;
+	margin-bottom: 1em;
+	border-style: inset;
+	border-width: 2px;
+}
+
+#map {
+	width: 550px;
+	height: 400px;
+}

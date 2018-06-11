@@ -4,8 +4,11 @@
   "description": "for Valentin",
   "main": "server.js",
   "dependencies": {
+    "commander": "^2.15.1",
     "dotenv": "^6.0.0",
-    "mongodb": "^3.0.10"
+    "mongodb": "^3.0.10",
+    "node-fetch": "^2.1.2",
+    "xlsx": "^0.13.0"
   },
   "devDependencies": {},
   "scripts": {

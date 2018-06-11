@@ -57,5 +57,8 @@ typings/
 # dotenv environment variables file
 .env
 
+#visual studio workspace settings
+.vscode
+
 # next.js build output
 .next

@@ -16,6 +16,7 @@ nav {
     align-items: center;
     padding: 1%;
     margin: 1%;
+    height: 100px;
 }
 
 article {
@@ -50,4 +51,3 @@ hr {
     width: 550px;
     height: 400px;
 }
-
