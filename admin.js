@@ -1,60 +1,34 @@
-function pigmantate() {
-  $("body")
-    .find("*")
-    .each(function() {
-      $(this).css({
-        "background-color":
-          "rgb(" +
-          Math.floor(Math.random() * 55 + 200).toString() +
-          ", " +
-          Math.floor(Math.random() * 55 + 200).toString() +
-          ", " +
-          Math.floor(Math.random() * 55 + 200).toString() +
-          ")"
-      });
-    });
+const homeUrl = "/";
+let the;
+let notThe;
+
+let data = {
+  mode: "read",
+  table: 'goods',
+  arr: {
+    id: undefined,
+    name: undefined,
+    own_earnings: undefined,
+    mother: undefined,
+    new_name: undefined,
+    new_earnings: undefined
+  }
 }
 
-function plugButtons() {}
 
-$(function() {
+$(function () {
   pigmantate();
-  let $constructor = $("#new-goods-constructor").clone(true);
-  // $('#new-goods-constructor').remove();
 
-  $("#add-new-goods").on("click", function() {
-    $("#add-new-goods-item").before($constructor.clone(true));
-  });
+  const itemConstructor =
+    '<li>  <span>Нова одиниця товару</span>  <br>  <input class="name" type="text" placeholder="Назва товару">  <br>  <input class="price" type="text" placeholder="Ціна">  <br>  <label>Картинка: </label>  <input type="file">  <br>  <button class="btn newbie add-to-page">Встромити в сторінку</button>  <button class="btn newbie clear-from-page">Зачистити введене</button></li>';
 
-  $("#new-goods-apply").on("click", function() {
-    let enteredData = [];
-    let lol = 0;
-    $(this)
-      .siblings()
-      .find("input")
-      .map((index, element) => {
-        console.log($element.val());
-        lol++;
-      });
-    // .map((index, $element) => {
-    // 	enteredData.push($element.val());
-    // 	console.log($element.val());
-    // 	lol++;
-    // });
-    console.log(lol);
+  addClickabilityToNewbie(itemConstructor);
 
-    let $myFrame = $("#myFrame").clone(true);
-    $myFrame.attr("id", "temproary");
-    console.log($myFrame);
+  $("#item-constructor").hide();
 
-    $(this)
-      .parent()
-      .after('<li id="new-item"></li>');
-    $("#new-item").append($myFrame);
-    // $myFrame.find('#name').text($(this).siblings().find('#new-goods-name').val())
+  fetchForDb(data).then((res) => {
+    insertGroupsByResponse(res.unique());
+    insertGoodsByResponse(res)
+  })
 
-    $(this)
-      .parent()
-      .remove();
-  });
 });

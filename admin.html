@@ -1,0 +1,73 @@
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="description" content="фото послуги фотографії">
+	<title>GrandPlans</title>
+	<link rel="stylesheet" href="admin.css">
+
+</head>
+
+<body>
+	<nav>
+
+		<div id="goods-menu" class="navCell">
+			<p id="goods-title">Каталог Товарів</p>
+			<ul>
+
+				<li>
+					<input type="text" placeholder="Назва групи товарів">
+					<button class="btn newbie subtitute-group-name">ok, хіба ні?</button>
+					<button class="btn newbie clear-from-page">Видалити групу товарів</button>
+					<ul>
+
+						<li>
+							<span>Нова одиниця товару</span>
+							<br>
+							<input class="name" type="text" placeholder="Назва товару">
+							<br>
+							<input class="price" type="text" placeholder="Ціна">
+							<br>
+							<label>Картинка: </label>
+							<input type="file">
+							<br>
+							<button class="btn newbie add-to-page">Встромити в сторінку</button>
+							<button class="btn newbie clear-from-page">Зачистити введене</button>
+						</li>
+
+						<li id="add-new-item-item">
+							<button class="btn newbie add-new-item">+ Одиниця з групи товарів</button>
+						</li>
+
+					</ul>
+				</li>
+
+				<li>
+					<button class="btn newbie add-new-goods-group">+ Групу товарів</button>
+				</li>
+
+			</ul>
+		</div>
+
+
+		<div id="todo-open">
+			<p id="todo-title"> Зробити фотографії</p>
+
+		</div>
+
+
+		<div id="services-menu">
+			<p id="services-title">Список послуг</p>
+
+		</div>
+
+	</nav>
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="adminFrontFunctions.js"></script>
+	<script src="admin.js"></script>
+
+</body>
+
+</html>
