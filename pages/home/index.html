@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <title>GrandPlans</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./pages/home/style.css">
 </head>
 
 <body>
-
+    <a href="./pages/admin/admin.html">admin page</a>
     <header>
         <a href="./">
             <h1>фото без турбот</h1>
@@ -16,30 +16,28 @@
     </header>
 
     <nav>
-        <a href="pages/goods.html">
-            <div id="goods-menu" class="navCell">
-                <p>Каталог Товарів</p>
+        <div id="goods-menu" class="navCell">
+            <p>Каталог Товарів</p>
+            <ul>
                 <ul>
-                    <ul>
-                        <li>Фоторамки
-                            <ul>
-                                <li>big</li>
-                                <li>middle</li>
-                                <li>small</li>
-                            </ul>
-                        </li>
-                        <li>Фотоплівка
-                            <ul>
-                                <li>Kodak200x24</li>
-                                <li>Kodak200x36</li>
-                                <li>Fuji200x36</li>
-                            </ul>
-                        </li>
-                        <li>Батарейки </li>
-                    </ul>
+                    <li>Фоторамки
+                        <ul>
+                            <li>big</li>
+                            <li>middle</li>
+                            <li>small</li>
+                        </ul>
+                    </li>
+                    <li>Фотоплівка
+                        <ul>
+                            <li>Kodak200x24</li>
+                            <li>Kodak200x36</li>
+                            <li>Fuji200x36</li>
+                        </ul>
+                    </li>
+                    <li>Батарейки </li>
                 </ul>
-            </div>
-        </a>
+            </ul>
+        </div>
 
         <div id="todo-open">
             <p> Зробити фотографії</p>
@@ -51,28 +49,24 @@
             </ul>
         </div>
 
-        <a href="pages/services.html">
-            <div id="service-menu">
-                <p>Список послуг</p>
-                <ul>
-                    <li>Друк Фотографій
-                        <a href="http://localhost:8085/other/sample.html">priceList</a>
-                        <div>Розміри
-                            <ul>
-                                <li>10x15</li>
-                                <li>20x30</li>
-                                <li>100x150</li>
-                                <li>0,1x0,01</li>
-                            </ul>
-                        </div>
-
-
-                    </li>
-                    <li>Послуги з фотоплівкою</li>
-                    <li>Фото на документи</li>
-                </ul>
-            </div>
-        </a>
+        <div id="service-menu">
+            <p>Список послуг</p>
+            <ul>
+                <li>Друк Фотографій
+                    <a href="http://localhost:8085/other/sample.html">priceList</a>
+                    <div>Розміри
+                        <ul>
+                            <li>10x15</li>
+                            <li>20x30</li>
+                            <li>100x150</li>
+                            <li>0,1x0,01</li>
+                        </ul>
+                    </div>
+                </li>
+                <li>Послуги з фотоплівкою</li>
+                <li>Фото на документи</li>
+            </ul>
+        </div>
     </nav>
 
     <hr>
@@ -103,7 +97,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="script.js"></script>
+    <script src="./pages/home/script.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7CgFfRqztZypbB9PzbZ2Hl5xGoCNCgEg&callback=initMap"></script>
 
 

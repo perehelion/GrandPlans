@@ -89,7 +89,7 @@ var server = http
 			if (req.method == "GET") {
 				let fileurl;
 				if (req.url == "/") {
-					fileurl = "./index.html";
+					fileurl = "./pages/home/index.html";
 				} else {
 					fileurl = req.url;
 				}
