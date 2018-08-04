@@ -159,6 +159,8 @@ function fetchForDb(data) {
 				});
 		})
 		.then(res => {
+			console.log(res);
+			
 			return res;
 		});
 	return response

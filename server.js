@@ -9,7 +9,8 @@ const mysql = require("mysql");
 var mimeLookup = {
 	".js": "application/javascript",
 	".html": "text/html",
-	".css": "text/css"
+	".css": "text/css",
+	".jpg": "image/jpeg"
 };
 
 function send404(response, request) {
@@ -24,42 +25,63 @@ function send404(response, request) {
 	);
 }
 
-function queryGenerator(mode,table, arr = new Object()) {
+function queryGenerator(mode, table, arr = new Object()) {
 	if (arr.id == undefined) {
 		arr.id = "NULL";
 	}
 	if (arr.mother == undefined) {
 		arr.mother == "NULL";
 	}
+
 	switch (mode) {
 		case "read":
-			return `SELECT * FROM goods`;
+			return `SELECT * FROM ${table}`;
 
 		case "add":
-			return `INSERT INTO company (name, notes, group_name) VALUES \
-							('${arr.name}',${arr.notes},'${arr.group_name}')`;
-							
-		case "edit":
-			if (arr.new_name != undefined && arr.new_earnings != undefined) {
-				return `UPDATE company SET own_earnings = ${arr.new_earnings}\
-								WHERE id = ${arr.id} OR name = '${arr.name}';\
-								UPDATE company SET name = '${arr.new_name}' WHERE id = ${ arr.id} \
-								OR name = '${arr.name}'`;
-			} else if (arr.new_name != undefined) {
-				console.log(`UPDATE company SET name = '${arr.ew_name}'\
-				WHERE id = ${arr.id} OR name = '${arr.name}'`);
-
-				return `UPDATE company SET name = '${arr.new_name}'\
-								WHERE id = ${arr.id} OR name = '${arr.name}'`;
-			} else if (arr.new_earnings != undefined) {
-				return `UPDATE company SET own_earnings = ${ arr.new_earnings} \
-								WHERE id = ${arr.id} OR name = '${arr.name}'`;
+			if (table == 'goods' || table == 'services') {
+				return `INSERT INTO ${table} (name, notes, group_name, img_adress) VALUES \
+							('${arr.name}',${arr.notes},'${arr.group_name}, ${arr.img_adress}')`;
+			} else if (table == 'todos') {
+				return `INSERT INTO ${table} (name, notes, img_adress) VALUES \
+							('${arr.name}',${arr.notes}, ${arr.img_adress}')`;
+			} else if (table == 'news') {
+				return `INSERT INTO ${table} (title, content, img_adress) VALUES \
+							('${arr.title}',${arr.content}, ${arr.img_adress}')`;
 			}
-			return queryGenerator("read");
+
+		case "edit":
+			let temp = '';
+			if (arr.new.name != undefined) {
+				temp += `UPDATE ${table} SET name = ${arr.new.name}\
+					WHERE id = ${arr.id} OR name = '${arr.name}';`
+			};
+			if (arr.new.img_adress != undefined) {
+				temp += `UPDATE ${table} SET img_adress = ${arr.new.img_adress}\
+					WHERE id = ${arr.id} OR name = '${arr.name}';`
+			};
+			if (arr.new.notes != undefined) {
+				temp += `UPDATE ${table} SET img_adress = ${arr.new.notes}\
+					WHERE id = ${arr.id} OR name = '${arr.name}';`
+			};
+			if (arr.new.price_coins != undefined) {
+				temp += `UPDATE ${table} SET img_adress = ${arr.new.price_coins}\
+					WHERE id = ${arr.id} OR name = '${arr.name}';`
+			};
+			if (arr.new.title != undefined) {
+				temp += `UPDATE ${table} SET name = ${arr.new.title}\
+					WHERE id = ${arr.id} OR name = '${arr.name}';`
+			};
+			if (arr.new.content != undefined) {
+				temp += `UPDATE ${table} SET name = ${arr.new.content}\
+					WHERE id = ${arr.id} OR name = '${arr.name}';`
+			}
+			if (temp == '') {
+				return queryGenerator('read')
+			} else return temp
 
 		case "delete":
-			return `DELETE FROM company WHERE name = \ 
-			'${arr.name}' OR id = ${arr.id} OR mother = '${arr.mother}'`;
+			return `DELETE FROM ${table} WHERE name = \ 
+			'${arr.name}' OR id = ${arr.id} OR group_name = '${arr.group_name}'`;
 
 		default:
 			return queryGenerator("read");
@@ -120,12 +142,12 @@ var server = http
 				});
 				req.on("end", () => {
 					body = JSON.parse(body);
-					connectionToDB.query(queryGenerator(body.mode, body.arr), (err, result) => {
+					connectionToDB.query(queryGenerator(body.mode,body.table, body.arr), (err, result) => {
 						if (err) {
 							res.writeHead(200, {
 								"content-type": "text/plain"
 							});
-							res.write(JSON.stringify('some error happen'));
+							res.write(JSON.stringify("some error happen ask Serhii'co to solve it"));
 							console.error(
 								`${new Date().getHours()}:${new Date().getMinutes()}  just sent error message on DB request: ${err}`
 							);
@@ -139,7 +161,6 @@ var server = http
 							);
 						}
 					})
-
 				});
 			}
 		}).then(() => {
