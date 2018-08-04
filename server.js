@@ -38,6 +38,7 @@ function queryGenerator(mode, table, arr = new Object()) {
 			return `SELECT * FROM ${table}`;
 
 		case "add":
+<<<<<<< HEAD
 			if (table == 'goods' || table == 'services') {
 				return `INSERT INTO ${table} (name, notes, group_name, img_adress) VALUES \
 							('${arr.name}',${arr.notes},'${arr.group_name}, ${arr.img_adress}')`;
@@ -49,6 +50,11 @@ function queryGenerator(mode, table, arr = new Object()) {
 							('${arr.title}',${arr.content}, ${arr.img_adress}')`;
 			}
 
+=======
+			return `INSERT INTO goods (name, notes, group_name) VALUES \
+							('${arr.name}',${arr.notes},'${arr.group_name}')`;
+							
+>>>>>>> d63e37a618f44aabaf3520338b1bad3a61a53d82
 		case "edit":
 			let temp = '';
 			if (arr.new.name != undefined) {
@@ -89,11 +95,11 @@ function queryGenerator(mode, table, arr = new Object()) {
 }
 
 var connectionToDB = mysql.createConnection({
-	// host: process.env.DB_HOST,
+	host: process.env.DB_HOST,
 	user: process.env.DB_USERNAME,
 	password: process.env.DB_PWD,
 	database: process.env.DB_NAME,
-	// port: process.env.DB_PORT
+	port: process.env.DB_PORT
 })
 connectionToDB.connect((err) => {
 	if (err) throw err;
