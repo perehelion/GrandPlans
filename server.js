@@ -19,9 +19,7 @@ function send404(response, request) {
 	});
 	response.write("Error 404: Resource not found.");
 	console.info(
-		`${new Date().getHours()}:${new Date().getMinutes()}  just sent err404 on ${
-      request.url
-    }`
+		`${new Date().getHours()}:${new Date().getMinutes()}  just sent err404 on ${request.url}`
 	);
 }
 
@@ -38,7 +36,6 @@ function queryGenerator(mode, table, arr = new Object()) {
 			return `SELECT * FROM ${table}`;
 
 		case "add":
-<<<<<<< HEAD
 			if (table == 'goods' || table == 'services') {
 				return `INSERT INTO ${table} (name, notes, group_name, img_adress) VALUES \
 							('${arr.name}',${arr.notes},'${arr.group_name}, ${arr.img_adress}')`;
@@ -49,12 +46,9 @@ function queryGenerator(mode, table, arr = new Object()) {
 				return `INSERT INTO ${table} (title, content, img_adress) VALUES \
 							('${arr.title}',${arr.content}, ${arr.img_adress}')`;
 			}
-
-=======
 			return `INSERT INTO goods (name, notes, group_name) VALUES \
 							('${arr.name}',${arr.notes},'${arr.group_name}')`;
-							
->>>>>>> d63e37a618f44aabaf3520338b1bad3a61a53d82
+
 		case "edit":
 			let temp = '';
 			if (arr.new.name != undefined) {
@@ -148,7 +142,7 @@ var server = http
 				});
 				req.on("end", () => {
 					body = JSON.parse(body);
-					connectionToDB.query(queryGenerator(body.mode,body.table, body.arr), (err, result) => {
+					connectionToDB.query(queryGenerator(body.mode, body.table, body.arr), (err, result) => {
 						if (err) {
 							res.writeHead(200, {
 								"content-type": "text/plain"
