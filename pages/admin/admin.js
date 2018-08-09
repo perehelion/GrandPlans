@@ -1,26 +1,36 @@
 const homeUrl = "/";
 const mainTables = ["goods", "services", "news", "todos"];
+const firstLevelButtonClasses = [
+  "new-group",
+  "new-item",
+  "new-todos",
+  "new-news",
+  "del-parent-group",
+  "del-parent-item"
+];
 let tables = [];
 let fetchPromises = [];
+let saveQueryStack = [];
+let noId_count = 0;
 
 let data_sample = {
   mode: "read",
   table: "goods",
   arr: {
-    id: undefined,
-    name: undefined,
-    own_earnings: undefined,
-    mother: undefined,
-    new_name: undefined,
-    new_earnings: undefined
+    id: new Number(),
+    name: new String(),
+    title: new String(),
+    notes: new String(),
+    content: new String(),
+    price_coins: new Number(),
+    group_name: new String(),
+    new_name: new String(),
+    new_price: new Number(),
+    new_notes: new String()
   }
 };
 
 $(function() {
-  // temporary:
-  $("#constructor-sample").hide();
-  $("#item-constructor").hide();
-
   mainTables.map(tab => {
     fetchPromises.push(
       fetch(homeUrl, {
@@ -57,37 +67,322 @@ $(function() {
     tables.map(table => {
       if (table.tableName == "todos" || table.tableName == "news") {
       } else {
-        embedGroups(
-          (tabName = table.tableName),
-          (groups = getUniqueGroupNames(table.items))
-        );
+        table.groups = getUniqueGroupNames(table.items);
+        embedGroups((tabName = table.tableName), (groups = table.groups));
       }
       embedItems((tab = table));
-      // embedAddbuttons((tab = table));
     });
-    // embedInteraction()
-    // pigmantate();
+
+    firstLevelButtonClasses.map(buttonClass => {
+      embedInteraction(buttonClass);
+    });
   });
 });
 
-// function embedInteraction() {
-//   const buttonClasses = [
-//     '.construct-new-group',
-//     '.construct-new-item',
-//     '.add-to-page',
-//     '.del-parent',
-//     '.call-item-constructor',
-//     '.call-group-constructor'
-//   ]
-//   $('.newbie.construct-new-group').on('click', (event) => {
-//     console.log(event);
+function embedInteraction(buttonClass) {
+  const allClasses = {
+    firstLevel: [
+      "new-group",
+      "new-item",
+      "new-todos",
+      "new-news",
+      "del-parent-group",
+      "del-parent-item"
+    ],
+    secondLevel: ["del-parent-cancel", "embed-entered-group"]
+  };
+  switch (buttonClass) {
+    case "new-group":
+      /**
+       * calls for a group constructor
+       */
+      {
+        $(".newbie.new-group").on("click", event => {
+          $(event.target)
+            .parent()
+            .before(htmlGenerator((type = "group constructor")));
+          embedInteraction("del-parent-cancel");
+          embedInteraction("embed-entered-group");
+          $(event.target).toggleClass("newbie");
+        });
+      }
 
-//     $(event.target)
-//       .parent()
-//       .before(htmlGenerator('group constructor'));
+      break;
 
-//   });
-// }
+    case "new-item":
+      /**
+       * calls for an item constructor
+       */
+
+      {
+        $(".newbie.new-item").on("click", event => {
+          $(event.target)
+            .parent()
+            .before(htmlGenerator((type = "item constructor")));
+          embedInteraction("del-parent-cancel");
+          embedInteraction("embed-entered-item");
+          $(event.target).toggleClass("newbie");
+        });
+      }
+      break;
+
+    case "new-todos":
+      /**
+       * calls for a todos constructor
+       */
+      {
+        $(".newbie.new-todos").on("click", event => {
+          $(event.target)
+            .parent()
+            .before(htmlGenerator((type = "todos constructor")));
+          embedInteraction("del-parent-cancel");
+          embedInteraction("embed-entered-item");
+          $(event.target).toggleClass("newbie");
+        });
+      }
+
+      break;
+
+    case "new-news":
+      /**
+       * calls for a news constructor
+       */
+      {
+        $(".newbie.new-news").on("click", event => {
+          $(event.target)
+            .parent()
+            .before(htmlGenerator((type = "news constructor")));
+          embedInteraction("del-parent-cancel");
+          embedInteraction("embed-entered-item");
+          $(event.target).toggleClass("newbie");
+        });
+      }
+
+      break;
+
+    case "del-parent-cancel"
+    /**
+     *deletes the constructor on clicking corresponding button,
+     *while canceling adding new item or group
+     */: {
+      $(".newbie.del-parent-cancel").on("click", event => {
+        $(event.target.parentNode).remove();
+      });
+      break;
+    }
+
+    case "del-parent-item":
+      /**
+       *deletes an item on clicking corresponding button
+       */
+      {
+        $(".newbie.del-parent-item").on("click", event => {
+          let itId;
+          try {
+            itId = event.target.parentNode.parentNode.id
+              .split("#")[1]
+              .split("-");
+          } catch (typeError) {
+            if (typeError.name == "TypeError") {
+              itId = event.target.parentNode.parentNode.id.split("-");
+            }
+          }
+
+          if (itId[0] == "noId") {
+            saveQueryStack.map(q => {
+              console.log(q.arr.itId, itId);
+
+              if (q.arr.itId == itId.join("-")) {
+                console.log("identity!!!!");
+
+                q.mode = "canceled";
+              }
+            });
+          } else if (itId[0] == "goods" || itId[0] == "services") {
+            saveQueryStack.push({
+              mode: "delete",
+              table: itId[0],
+              arr: {
+                id: itId[3]
+              }
+            });
+          } else if (itId[0] == "todos" || itId[0] == "news") {
+            saveQueryStack.push({
+              mode: "delete",
+              table: itId[0],
+              arr: {
+                id: itId[1]
+              }
+            });
+          }
+
+          $(event.target.parentNode)
+            .parent()
+            .remove();
+        });
+      }
+      break;
+
+    case "del-parent-group":
+      /**
+       * deletes an group and all descendant items on clicking corresponding button
+       */
+      {
+        $(".newbie.del-parent-group").on("click", event => {
+          $(event.target.parentNode.parentNode.childNodes[3].childNodes).map(
+            (i, el) => {
+              console.log(el.id);
+              let itId;
+              try {
+                itId = el.id.split("#")[1].split("-");
+              } catch (typeError) {
+                if (typeError.name == "TypeError") {
+                  itId = el.id.split("-");
+                }
+              }
+
+              if (itId[0] == "noId") {
+                saveQueryStack.map(q => {
+                  console.log(q.arr.itId, itId);
+
+                  if (q.arr.itId == itId.join("-")) {
+                    console.log("identity!!!!");
+
+                    q.mode = "canceled";
+                  }
+                });
+              } else if (itId[0] == "goods" || itId[0] == "services") {
+                saveQueryStack.push({
+                  mode: "delete",
+                  table: itId[0],
+                  arr: {
+                    id: itId[3]
+                  }
+                });
+              } else if (itId[0] == "todos" || itId[0] == "news") {
+                saveQueryStack.push({
+                  mode: "delete",
+                  table: itId[0],
+                  arr: {
+                    id: itId[1]
+                  }
+                });
+              }
+            }
+          );
+
+          $(event.target.parentNode)
+            .parent()
+            .remove();
+        });
+      }
+      break;
+
+    case "embed-entered-group":
+      /**
+       * embeds data from group constructor
+       * after clicking correspond button
+       */
+
+      {
+        $(".newbie.embed-entered-group").on("click", event => {
+          let newGroupName = $(event.target.parentNode)
+            .children("input.name")
+            .val();
+          let newGroupTable = $(event.target.parentNode.parentNode)
+            .attr("id")
+            .split("-")[0];
+
+          groups.push(newGroupName);
+
+          $(event.target.parentNode).before(
+            htmlGenerator(
+              (type = "new group"),
+              (args = {
+                group_id: `${newGroupTable}-${groups[groups.length - 1]}`,
+                group_name: newGroupName
+              })
+            )
+          );
+          $(event.target.parentNode).remove();
+          embedInteraction("new-item");
+          embedInteraction("del-parent-group");
+        });
+      }
+      break;
+
+    case "embed-entered-item"
+    /**
+     * embeds data from item constructor
+     * after clicking correspond button
+     */: {
+      $(".newbie.embed-entered-item").on("click", event => {
+        let tempParams = new Object();
+        $(event.target)
+          .siblings("input")
+          .map((i, elem) => {
+            if (elem.type != "file") {
+              if ($(elem).val() == "") {
+                $(elem)
+                  .siblings("b")
+                  .text("Слід заповнити всі ці поля")
+                  .css({
+                    color: "red"
+                  });
+                tempParams.isAllowed = false;
+              } else {
+                tempParams.isAllowed = true;
+                tempParams[$(elem).attr("class")] = $(elem).val();
+              }
+            }
+          });
+
+        if (tempParams.isAllowed) {
+          tempParams.tableName = event.target.parentNode.parentNode.id.split(
+            "-"
+          )[0];
+          tables.slice(0, 2).map(table => {
+            if (table.tableName == tempParams.tableName) {
+              tempParams.group_name =
+                table.groups[
+                  event.target.parentNode.parentNode.id.split("-")[1]
+                ];
+            }
+          });
+
+          $(event.target.parentNode).before(
+            htmlGenerator(
+              (type = "new item"),
+              (args = {
+                itemId: "noId-" + noId_count,
+                name: tempParams.name,
+                price_coins: tempParams.price * 100,
+                notes: tempParams.notes
+              })
+            )
+          );
+
+          saveQueryStack.push({
+            mode: "add",
+            table: tempParams.tableName,
+            arr: {
+              name: tempParams.name,
+              notes: tempParams.notes,
+              price_coins: parseInt(tempParams.price * 100),
+              group_name: tempParams.group_name,
+              itId: "noId-" + noId_count++
+            }
+          });
+
+          $(event.target.parentNode).remove();
+          embedInteraction("del-parent-item");
+        }
+      });
+    }
+    default:
+      break;
+  }
+}
 
 function embedGroups(tabName, groups) {
   let tabListId = `#${tabName}-list`,
@@ -106,9 +401,10 @@ function embedGroups(tabName, groups) {
 }
 
 function embedItems(tab) {
+  let dadId;
   tab.items.map(item => {
     if (item.group_name != undefined) {
-      let dadId = `#${tab.tableName}-${groups.indexOf(item.group_name)}-list`;
+      dadId = `#${tab.tableName}-${groups.indexOf(item.group_name)}-list`;
       $(dadId).prepend(
         htmlGenerator(
           (type = "new item"),
@@ -121,7 +417,7 @@ function embedItems(tab) {
         )
       );
     } else if (tab.tableName == "news") {
-      let dadId = `#${tab.tableName}-list`;
+      dadId = `#${tab.tableName}-list`;
       $(dadId).append(
         htmlGenerator(
           (type = "new news"),
@@ -133,7 +429,7 @@ function embedItems(tab) {
         )
       );
     } else {
-      let dadId = `#${tab.tableName}-list`;
+      dadId = `#${tab.tableName}-list`;
       $(dadId).append(
         htmlGenerator(
           (type = "new todos"),
@@ -146,72 +442,95 @@ function embedItems(tab) {
       );
     }
   });
+  if (dadId.split("-").length == 2) {
+    let temp = `<li class = 'staff-item'>\
+                  <button class='btn newbie new-${tab.tableName}'>+</button>\
+                </li>`;
+    $(dadId).append(temp);
+  }
 }
 
 function htmlGenerator(type = "", args = new Object()) {
-  if (args == undefined) {
-    switch (type) {
-      case "item constructor":
-        return `<li>\
-          <span>Нова одиниця товару</span>  <br>  \
-          <input class="name" type="text" placeholder="Назва товару">  <br>  \
-          <input class="price" type="text" placeholder="Ціна">  <br>  \
-          <label>Картинка: </label>  <input type="file">  <br>  \
-          <button class="btn newbie add-to-page">Встромити в сторінку</button>  \
-          <button class="btn newbie del-parent">Відмінити створення</button>  \
-          </li>`;
+  switch (type) {
+    case "item constructor":
+      return `<li  class='staff-item constructor'>\
+              <b>Новий запис</b>  <br>  \
+              <input class="name" type="text" placeholder="Назва">  <br>  \
+              <input class="price" type="number" min="0" placeholder="Ціна">  <br>  \
+              <input class="notes" type="text" placeholder="Опис">  <br>  \
+              <label>Картинка: </label>  <input type="file">  <br>  \
+              <button class="btn newbie embed-entered-item">🗸</button>  \
+              <button class="btn newbie del-parent-cancel">🗴</button>  \
+              </li>`;
 
-      case "group constructor":
-        return `<li>\
-          <span>Нова Група </span>  <br>  \
-          <input class="name" type="text" placeholder="Назва групи">  <br>  \
-          <button class="btn newbie add-to-page">Встромити в сторінку</button>\
-          <button class="btn newbie del-parent">Відмінити створення</button>  \
-          </li>`;
-      case "new group button":
-        return `<li>\
-          <button class="btn newbie staff-group construct-new-group">+ Групу</button>\
-          </li>`;
-    }
-  } else {
-    switch (type) {
-      case "new group":
-        return `<li id='${args.group_id}' class='staff-group'> \
-          <h2 class='group-name'>${args.group_name}\
-            <button class='btn newbie edit-group'>🖉</button>\
-            <button class="btn newbie del-parent">🗑</button>\
-          </h2>
-          <ul id='${args.group_id}-list'><li class = 'staff-item'>\
-            <button class="btn newbie construct-new-item">+</button>\
-          </li></ul>\
-          </li>`;
-      case "new item":
-        return `<li id='${args.itemId}' class='staff-item'> \
-          <span>
-            <b class='item-name'>${args.name}</b><br>\
-            <u class='item-price'>${args.price_coins / 100}грн</u><br>\
-            <i class='item-notes'>${args.notes}</i><br>\
-            <button class="btn newbie edit-item">🖉</button>\
-            <button class="btn newbie del-parent">🗑</button>\
-          </span>
-          </li>`;
-      case "new news":
-        return `<li id='${args.newsId}' class='staff-item'> \
-        <span>
-          <b class='item-name'>${args.title}</b><br>\
-          <span class='item-content'>${args.content}</span><br>\
-          <button class="btn newbie edit-item">🖉</button>\
-          <button class="btn newbie del-parent">🗑</button>\
-        </span>
-        </li>`;
-      case "new todos":
-        return `<li id='${args.todosId}' class='staff-item'> \
-        <b class='item-name'>${args.name}</b><br>\
-        <i class='item-notes'>${args.notes}</i><br>\
-        <button class="btn newbie call-item-constructor">🖉</button>\
-        <button class="btn newbie del-parent">🗑</button>\
-        </li>`;
-    }
+    case "news constructor":
+      return `<li  class='staff-item constructor'>\
+                <b>Новий запис</b>  <br>  \
+                <input class="title" type="text" placeholder="Заголовок">  <br>  \
+                <textarea class="cotent" placeholder="Впишіть сюди суть новини" rows="4" cols="45"></textarea> <br>\
+                <label>Картинка: </label>  <input type="file">  <br>  \
+                <button class="btn newbie embed-entered-item">🗸</button>  \
+                <button class="btn newbie del-parent-cancel">🗴</button>  \
+              </li>`;
+
+    case "todos constructor":
+      return `<li  class='staff-item constructor'>\
+                <b>Новий запис</b>  <br>  \
+                <input class="name" type="text" placeholder="Назва пункту">  <br>  \
+                <input class="notes" type="text" placeholder="Опис">  <br>  \
+                <label>Картинка: </label>  <input type="file">  <br>  \
+                <button class="btn newbie embed-entered-item">🗸</button>  \
+                <button class="btn newbie del-parent-cancel">🗴</button>  \
+              </li>`;
+
+    case "group constructor":
+      return `<li class="staff-group constructor">\
+                <span>Нова Група </span>  <br>  \
+                <input class="name" type="text" placeholder="Назва групи">  <br>  \
+                <button class="btn newbie embed-entered-group">🗸</button>  \
+                <button class="btn newbie del-parent-cancel">🗴</button>  \
+              </li>`;
+
+    case "new group":
+      return `<li id='${args.group_id}' class='staff-group'> \
+                <h2 class='group-name'>${args.group_name}\
+                  <button class='btn newbie edit-group'>🖉</button>\
+                  <button class="btn newbie del-parent-group">🗑</button>\
+                </h2>
+                <ul id='${args.group_id}-list'><li class = 'staff-item'>\
+                  <button class="btn newbie new-item">+</button>\
+                </li></ul>\
+              </li>`;
+    case "new item":
+      return `<li id='${args.itemId}' class='staff-item'> \
+                <span>
+                  <b class='item-name'>${args.name}</b><br>\
+                  <u class='item-price'>${args.price_coins / 100}грн</u><br>\
+                  <i class='item-notes'>${args.notes}</i><br>\
+                  <button class="btn newbie edit-item">🖉</button>\
+                  <button class="btn newbie del-parent-item">🗑</button>\
+                </span>
+              </li>`;
+    case "new news":
+      return `<li id='${args.newsId}' class='staff-item'> \
+                <span>
+                  <b class='item-name'>${args.title}</b><br>\
+                  <span class='item-content'>${args.content}</span><br>\
+                  <button class="btn newbie edit-item">🖉</button>\
+                  <button class="btn newbie del-parent-item">🗑</button>\
+                </span>
+              </li>`;
+    case "new todos":
+      return `<li id='${args.todosId}' class='staff-item'> \
+                <span>
+                  <b class='item-name'>${args.name}</b><br>\
+                  <i class='item-notes'>${args.notes}</i><br>\
+                  <button class="btn newbie edit-item">🖉</button>\
+                  <button class="btn newbie del-parent-item">🗑</button>\
+                </span>
+              </li>`;
+    default:
+      return "ALERT!!!! sth went wrong";
   }
 }
 
