@@ -9,6 +9,20 @@
 </head>
 
 <body>
+	
+	<form method="post" action="/imgupload" enctype="multipart/form-data">
+		<div>
+			<label for="image_uploads">Choose images to upload</label>
+			<input type="file" id="image_uploads" name="image_uploads" accept="image/*" multiple>
+		</div>
+		<div class="preview">
+			<p>No files currently selected for upload</p>
+		</div>
+		<div>
+			<button>Submit</button>
+		</div>
+	</form>
+	
 	<!-- <img src="/pages/media/black.jpg" alt="myImg"> -->
 	<nav>
 		<div id="goods" class="navCell">

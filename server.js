@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
 const mysql = require("mysql");
+const formidable = require('formidable');
 
 var mimeLookup = {
   ".js": "application/javascript",
@@ -103,7 +104,7 @@ connectionToDB.connect(err => {
 });
 
 var server = http
-  .createServer(function(req, res) {
+  .createServer(function (req, res) {
     new Promise(resolve => {
       if (req.url == "/favicon.ico") {
         send404(res, req);
@@ -122,7 +123,7 @@ var server = http
         var fileExt = path.extname(filepath);
         var mimeType = mimeLookup[fileExt];
 
-        fs.exists(filepath, function(exists) {
+        fs.exists(filepath, function (exists) {
           if (!exists) {
             send404(res, req);
             return;
@@ -135,12 +136,16 @@ var server = http
             `${new Date().getHours()}:${new Date().getMinutes()}  just sent a ${fileurl}`
           );
         });
-      } else if (req.method == "POST") {
+      } else if (req.method == "POST" && req.url != "/imgupload") {
         let body = "";
         req.on("data", data => {
           body += data;
         });
         req.on("end", () => {
+          fs.appendFile("./posting.log", body, function (err) {
+            fs.appendFileSync("./posting.log", "\n");
+          });
+
           body = JSON.parse(body);
           connectionToDB.query(
             queryGenerator(body.mode, body.table, body.arr),
@@ -167,9 +172,25 @@ var server = http
             }
           );
         });
+      } else if (req.method == "POST" && req.url == "/imgupload") {
+
+        let form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
+          fs.writeFile("./fields.log", fields, (err) => {
+            if (err) throw err
+          })
+          fs.writeFile("./files.log", files, (err) => {
+            if (err) throw err
+          })
+          res.write('ok')
+        })
       }
     }).then(() => {
       res.end();
+    }, (err) => {
+      fs.writeFile('./err.log', err, (err) => {
+        console.log('Error occured, you can read it in the err.log file');
+      })
     });
   })
   .listen(process.env.PORT);

@@ -1,3 +1,71 @@
+var input = document.querySelector('input');
+var preview = document.querySelector('.preview');
+
+input.style.opacity = 0;
+input.addEventListener('change', updateImageDisplay);
+
+function updateImageDisplay() {
+  while (preview.firstChild) {
+    preview.removeChild(preview.firstChild);
+  }
+
+  var curFiles = input.files;
+  if (curFiles.length === 0) {
+    var para = document.createElement('p');
+    para.textContent = 'No files currently selected for upload';
+    preview.appendChild(para);
+  } else {
+    var list = document.createElement('ol');
+    preview.appendChild(list);
+    for (var i = 0; i < curFiles.length; i++) {
+      var listItem = document.createElement('li');
+      var para = document.createElement('p');
+      if (validFileType(curFiles[i])) {
+        para.textContent = 'File name ' + curFiles[i].name + ', file size ' + returnFileSize(curFiles[i].size) + '.';
+        var image = document.createElement('img');
+        image.src = window.URL.createObjectURL(curFiles[i]);
+
+        listItem.appendChild(image);
+        listItem.appendChild(para);
+
+      } else {
+        para.textContent = 'File name ' + curFiles[i].name + ': Not a valid file type. Update your selection.';
+        listItem.appendChild(para);
+      }
+
+      list.appendChild(listItem);
+    }
+  }
+}
+var fileTypes = [
+  'image/jpeg',
+  'image/pjpeg',
+  'image/png'
+]
+
+function validFileType(file) {
+  for (var i = 0; i < fileTypes.length; i++) {
+    if (file.type === fileTypes[i]) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function returnFileSize(number) {
+  if (number < 1024) {
+    return number + 'bytes';
+  } else if (number > 1024 && number < 1048576) {
+    return (number / 1024).toFixed(1) + 'KB';
+  } else if (number > 1048576) {
+    return (number / 1048576).toFixed(1) + 'MB';
+  }
+}
+
+/**
+ *
+ */
 const homeUrl = "/";
 const mainTables = ["goods", "services", "news", "todos"];
 const firstLevelButtonClasses = [
@@ -30,7 +98,7 @@ let data_sample = {
   }
 };
 
-$(function() {
+$(function () {
   mainTables.map(tab => {
     fetchPromises.push(
       fetch(homeUrl, {
@@ -40,24 +108,24 @@ $(function() {
           table: tab
         })
       })
-        .then(res => {
-          return res;
-        })
-        .then(res => {
-          return res.body
-            .getReader()
-            .read()
-            .then(done => {
-              return JSON.parse(new TextDecoder("utf-8").decode(done.value));
-            });
-        })
-        .then(res => {
-          tables.push({
-            tableName: tab,
-            items: res
+      .then(res => {
+        return res;
+      })
+      .then(res => {
+        return res.body
+          .getReader()
+          .read()
+          .then(done => {
+            return JSON.parse(new TextDecoder("utf-8").decode(done.value));
           });
-          return res;
-        })
+      })
+      .then(res => {
+        tables.push({
+          tableName: tab,
+          items: res
+        });
+        return res;
+      })
     );
   });
 
@@ -65,8 +133,7 @@ $(function() {
     // now we have all items, let's embed it
 
     tables.map(table => {
-      if (table.tableName == "todos" || table.tableName == "news") {
-      } else {
+      if (table.tableName == "todos" || table.tableName == "news") {} else {
         table.groups = getUniqueGroupNames(table.items);
         embedGroups((tabName = table.tableName), (groups = table.groups));
       }
@@ -160,16 +227,17 @@ function embedInteraction(buttonClass) {
 
       break;
 
-    case "del-parent-cancel"
-    /**
-     *deletes the constructor on clicking corresponding button,
-     *while canceling adding new item or group
-     */: {
-      $(".newbie.del-parent-cancel").on("click", event => {
-        $(event.target.parentNode).remove();
-      });
-      break;
-    }
+    case "del-parent-cancel":
+      /**
+       *deletes the constructor on clicking corresponding button,
+       *while canceling adding new item or group
+       */
+      {
+        $(".newbie.del-parent-cancel").on("click", event => {
+          $(event.target.parentNode).remove();
+        });
+        break;
+      }
 
     case "del-parent-item":
       /**
@@ -190,11 +258,7 @@ function embedInteraction(buttonClass) {
 
           if (itId[0] == "noId") {
             saveQueryStack.map(q => {
-              console.log(q.arr.itId, itId);
-
               if (q.arr.itId == itId.join("-")) {
-                console.log("identity!!!!");
-
                 q.mode = "canceled";
               }
             });
@@ -231,7 +295,6 @@ function embedInteraction(buttonClass) {
         $(".newbie.del-parent-group").on("click", event => {
           $(event.target.parentNode.parentNode.childNodes[3].childNodes).map(
             (i, el) => {
-              console.log(el.id);
               let itId;
               try {
                 itId = el.id.split("#")[1].split("-");
@@ -243,11 +306,7 @@ function embedInteraction(buttonClass) {
 
               if (itId[0] == "noId") {
                 saveQueryStack.map(q => {
-                  console.log(q.arr.itId, itId);
-
                   if (q.arr.itId == itId.join("-")) {
-                    console.log("identity!!!!");
-
                     q.mode = "canceled";
                   }
                 });
@@ -311,74 +370,75 @@ function embedInteraction(buttonClass) {
       }
       break;
 
-    case "embed-entered-item"
-    /**
-     * embeds data from item constructor
-     * after clicking correspond button
-     */: {
-      $(".newbie.embed-entered-item").on("click", event => {
-        let tempParams = new Object();
-        $(event.target)
-          .siblings("input")
-          .map((i, elem) => {
-            if (elem.type != "file") {
-              if ($(elem).val() == "") {
-                $(elem)
-                  .siblings("b")
-                  .text("Слід заповнити всі ці поля")
-                  .css({
-                    color: "red"
-                  });
-                tempParams.isAllowed = false;
-              } else {
-                tempParams.isAllowed = true;
-                tempParams[$(elem).attr("class")] = $(elem).val();
+    case "embed-entered-item":
+      /**
+       * embeds data from item constructor
+       * after clicking correspond button
+       */
+      {
+        $(".newbie.embed-entered-item").on("click", event => {
+          let tempParams = new Object();
+          $(event.target)
+            .siblings("input")
+            .map((i, elem) => {
+              if (elem.type != "file") {
+                if ($(elem).val() == "") {
+                  $(elem)
+                    .siblings("b")
+                    .text("Слід заповнити всі ці поля")
+                    .css({
+                      color: "red"
+                    });
+                  tempParams.isAllowed = false;
+                } else {
+                  tempParams.isAllowed = true;
+                  tempParams[$(elem).attr("class")] = $(elem).val();
+                }
               }
-            }
-          });
+            });
 
-        if (tempParams.isAllowed) {
-          tempParams.tableName = event.target.parentNode.parentNode.id.split(
-            "-"
-          )[0];
-          tables.slice(0, 2).map(table => {
-            if (table.tableName == tempParams.tableName) {
-              tempParams.group_name =
-                table.groups[
-                  event.target.parentNode.parentNode.id.split("-")[1]
-                ];
-            }
-          });
+          if (tempParams.isAllowed) {
+            tempParams.tableName = event.target.parentNode.parentNode.id.split(
+              "-"
+            )[0];
+            tables.slice(0, 2).map(table => {
+              if (table.tableName == tempParams.tableName) {
+                tempParams.group_name =
+                  table.groups[
+                    event.target.parentNode.parentNode.id.split("-")[1]
+                  ];
+              }
+            });
 
-          $(event.target.parentNode).before(
-            htmlGenerator(
-              (type = "new item"),
-              (args = {
-                itemId: "noId-" + noId_count,
+            $(event.target.parentNode).before(
+              htmlGenerator(
+                (type = "new item"),
+                (args = {
+                  itemId: "noId-" + noId_count,
+                  name: tempParams.name,
+                  price_coins: tempParams.price * 100,
+                  notes: tempParams.notes
+                })
+              )
+            );
+
+            saveQueryStack.push({
+              mode: "add",
+              table: tempParams.tableName,
+              arr: {
                 name: tempParams.name,
-                price_coins: tempParams.price * 100,
-                notes: tempParams.notes
-              })
-            )
-          );
+                notes: tempParams.notes,
+                price_coins: parseInt(tempParams.price * 100),
+                group_name: tempParams.group_name,
+                itId: "noId-" + noId_count++
+              }
+            });
 
-          saveQueryStack.push({
-            mode: "add",
-            table: tempParams.tableName,
-            arr: {
-              name: tempParams.name,
-              notes: tempParams.notes,
-              price_coins: parseInt(tempParams.price * 100),
-              group_name: tempParams.group_name,
-              itId: "noId-" + noId_count++
-            }
-          });
-
-          $(event.target.parentNode).remove();
-          embedInteraction("del-parent-item");
-        }
-      });
-    }
+            $(event.target.parentNode).remove();
+            embedInteraction("del-parent-item");
+          }
+        });
+      }
     default:
       break;
   }
@@ -545,10 +605,9 @@ function getUniqueGroupNames(list) {
 function pigmantate() {
   $("body")
     .find("*")
-    .each(function() {
+    .each(function () {
       $(this).css({
-        "background-color":
-          "rgb(" +
+        "background-color": "rgb(" +
           Math.floor(Math.random() * 55 + 200).toString() +
           ", " +
           Math.floor(Math.random() * 55 + 200).toString() +
